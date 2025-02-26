@@ -32,22 +32,22 @@ class TournamentPlan:
         self.team_plan = {team: [] for team in self.teams}
         for block in plan:
             for team in self.teams:
-                field_side = None, 3
-                for field in block:
-                    for r, team_r in enumerate(field):
+                court_side = None, 3
+                for court in block:
+                    for r, team_r in enumerate(court):
                         if team == team_r:
-                            field_side = field, r
+                            court_side = court, r
                             break
-                    if field_side[0] is not None:
+                    if court_side[0] is not None:
                         break
-                self.team_plan[team].append(field_side)
+                self.team_plan[team].append(court_side)
 
     @property
     def blocks(self) -> int:
         return len(self._plan)
 
     @property
-    def fields(self) -> int:
+    def courts(self) -> int:
         return len(self._plan[0])
     
     @property
@@ -63,7 +63,7 @@ class TournamentPlan:
         current_time = self._start_time
         for block in self._plan:
             for f, (team1, team2, referee) in enumerate(block):
-                return_str += f"Field {f+1}, {current_time[0]:2n}:{current_time[1]:02n}: {team1.name} vs {team2.name} [{referee.name}]"
+                return_str += f"Court {f+1}, {current_time[0]:2n}:{current_time[1]:02n}: {team1.name} vs {team2.name} [{referee.name}]"
                 return_str += '\n'
             current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
             current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
@@ -76,7 +76,7 @@ class TournamentPlan:
             return_str += f"{name_str} "
         else:
             return_str += f"{name_str:<{name_str_length+1}} "
-        return_str += ' '.join(self.symb[self.role[r]] for field, r in self.team_plan[team])
+        return_str += ' '.join(self.symb[self.role[r]] for court, r in self.team_plan[team])
         return_str += '\n'
         return return_str
     
@@ -93,7 +93,7 @@ class TournamentPlan:
             current_time = self._start_time
             for b, block in enumerate(self._plan):
                 for f, (team1, team2, referee) in enumerate(block):
-                    match_nr = b * self.fields + f
+                    match_nr = b * self.courts + f
                     if match_nr == 0:
                         pos_ref = "\\mediumgap of GNr"
                     elif f == 0:

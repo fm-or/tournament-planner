@@ -1,0 +1,107 @@
+\documentclass[
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[a3paper,margin=20mm]{geometry}
+
+\usepackage[T1]{fontenc}% moderne Schriftkodierung
+\usepackage[utf8]{inputenc}% Sonderzeichen vieler verschiedener Sprachen gleichzeitig (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primär Deutsch und sekundär Englisch
+\usepackage[autostyle]{csquotes}% Anführungszeichen mit \enquote{} passen zur Sprache von babel
+\usepackage{lmodern}% Schriftfamilie latin modern basierend auf computer modern verträgt sich besser mit fontenc T1
+\usepackage{microtype}% Verbessert den Textsatz durch z.B. geringfügige Buchstaben-Skalierungen
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% löst Probleme mit floats 
+\usepackage[pdftex]{graphicx}
+
+\usepackage{float}
+
+\usepackage{ifthen}
+\def\a{0} % Schalter zwischen Schablone/Zeitplan (0) und Ergebnissen (1)
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+\def\b{5.5cm} % width of box
+\def\c{5cm} % text width
+\def\d{7cm} % text width
+\tikzset{titlenode/.style={draw, minimum width=\b, minimum height=0.8cm, align=left}}
+\tikzset{itemnode/.style={titlenode, text width=\c}}
+\tikzset{itemnodeWide/.style={titlenode, text width=\d}}
+\tikzset{smallnode/.style={draw, minimum height=0.8cm, minimum width= 1.5cm}}
+
+\newcommand{\createGame}[8]{%
+  \node[smallnode, #1] (G#2) {\strut #2};
+  \node[itemnode, right=0mm of G#2] (G#2serve) {\strut #3};
+  \node[itemnode,  right=0mm of G#2serve] (G#2receive) {\strut #4};
+  \node[smallnode, right=0mm of G#2receive] (G#2court) {\strut Court #5};
+  \node[itemnode, right=0mm of G#2court] (G#2referee) {\strut #6};
+  \node[smallnode, text width=16mm, align =center, right=0mm of G#2referee] (G#2info) {\strut \ifthenelse{\a=1}{#8}{#7}};
+}
+
+\ifthenelse{\a=1}{
+    \title{HM-VB Ablauf und Ergebnisse}
+}{
+    \title{HM-VB Zeitplan und Schablone}
+}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \center{\Huge{\textbf{Name of the tournament}}}
+    \center{\huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}}
+    \vspace{2em}
+    
+    \begin{figure}[H]
+    	
+        \centering
+        \begin{tikzpicture}
+        	\def\smallgap{5mm}
+        	\def\mediumgap{10mm}
+        	\def\largegap{15mm}
+        	
+            \coordinate (origin) at (0,0);
+            
+            \createGame{below=0mm of origin}{Nr}{Serving}{Receiving}{}{Referee}{Time}{Points}
+
+    		\input{schedule.tex}
+    		
+            \ifthenelse{\a=1}{
+                \createGame{below=\largegap of G20}{K1}{}{}{1}{}{20:30}{:}
+                \createGame{below=0mm of GK1}{K2}{}{}{2}{}{20:30}{:}
+                \createGame{below=0mm of GK2}{K5}{}{}{3}{}{20:30}{:}
+                
+                \createGame{below=\smallgap of GK5}{K3}{}{}{1}{}{20:45}{:}
+                \createGame{below=0mm of GK3}{K4}{}{}{2}{}{20:45}{:}
+                \createGame{below=0mm of GK4}{K6}{}{}{3}{}{20:45}{:}
+                
+                \createGame{below=\smallgap of GK6}{P3}{}{}{1}{}{21:00}{:}
+                \createGame{below=0mm of GP3}{P2}{}{}{2}{}{21:00}{:}
+                \createGame{below=0mm of GP2}{P5}{}{}{3}{}{21:00}{:}
+                
+                \createGame{below=\smallgap of GP5}{P1}{}{}{1}{}{21:15}{:}
+                \createGame{below=0mm of GP1}{P4}{}{}{3}{}{21:15}{:}
+            
+            }{
+                \createGame{below=\largegap of G20}{K1}{G1-2}{G2-3}{1}{G1-1}{20:30}{:}
+                \createGame{below=0mm of GK1}{K2}{G2-2}{G1-3}{2}{G2-1}{20:30}{:}
+                \createGame{below=0mm of GK2}{K5}{G1-4}{G2-5}{3}{G2-4}{20:30}{:}
+                
+                \createGame{below=\smallgap of GK5}{K3}{G1-1}{Gewinner K2}{1}{Verlierer K1}{20:45}{:}
+                \createGame{below=0mm of GK3}{K4}{G2-1}{Gewinner K1}{2}{Verlierer K2}{20:45}{:}
+                \createGame{below=0mm of GK4}{K6}{G2-4}{G1-5}{3}{G1-4}{20:45}{:}
+                
+                \createGame{below=\smallgap of GK6}{P3}{Verlierer K1}{Verlierer K2}{1}{Gewinner K3}{21:00}{:}
+                \createGame{below=0mm of GP3}{P2}{Verlierer K3}{Verlierer K4}{2}{Gewinner K4}{21:00}{:}
+                \createGame{below=0mm of GP2}{P5}{Verlierer K5}{Verlierer K6}{3}{Gewinner K5}{21:00}{:}
+                
+                \createGame{below=\smallgap of GP5}{P1}{Gewinner K3}{Gewinner K4}{1}{Gewinner P3}{21:15}{:}
+                \createGame{below=0mm of GP1}{P4}{Gewinner K5}{Gewinner K6}{3}{Gewinner P5}{21:15}{:}
+            
+            }
+        \end{tikzpicture}
+    
+    \end{figure}
+\end{document}

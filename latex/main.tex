@@ -78,7 +78,7 @@
 
     		\DTLloaddb{scheduledata}{schedule.csv}
 			\newcommand{\prevTime}{}
-            {\DTLforeach*{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee,\time=Time}{%
+            \DTLforeach{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee,\time=Time}{%
             	\ifthenelse{\match=1}{
             		\expandafter\createGame
 	               	\expandafter{below=\mediumgap of GNr}{\match}{\serving}{\receiving}{\court}{\referee}{\time}{:}
@@ -92,7 +92,7 @@
 	               	\fi
                	}
 	            \global\let\prevTime\time
-            }}
+            }
     		
             \ifthenelse{\a=1}{
                 \createGame{below=\largegap of G20}{K1}{}{}{1}{}{20:30}{:}

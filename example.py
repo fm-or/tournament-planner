@@ -2,6 +2,7 @@ from model.team import Team
 from model.group import Group
 from model.problem_solver import ProblemSolver
 
+tournament_name = "Our tournament"
 my_team = Team("My Team")
 groups = [
     Group("Group A", [my_team] + Team.create_incrementing_teams(4, start_index=1)),
@@ -18,5 +19,6 @@ tournament_plan = solver.solve(prioritized_solver_str="GUROBI", output=True)
 print(tournament_plan.get_tournament_schedule())
 print("")
 print(tournament_plan.get_teams_schedule())
+tournament_plan.write_latex_style("latex/tournamentstyle.sty", tournament_name,court_count)
 tournament_plan.write_latex_schedule("latex/schedule.tex")
 tournament_plan.write_latex_groups("latex/groups.tex")

@@ -98,24 +98,6 @@ class TournamentPlan:
                     file.write(f"\n{match_nr+1},{f+1},{team1.name},{team2.name},{referee.name},{current_time[0]:02n}:{current_time[1]:02n}")
                 current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
                 current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
-    
-    def write_latex_schedule(self, filename: str) -> None:
-        with open(filename, 'w', encoding="utf-8") as file:
-            current_time = self._start_time
-            for b, block in enumerate(self._plan):
-                for f, (team1, team2, referee) in enumerate(block):
-                    match_nr = b * self.courts + f
-                    if match_nr == 0:
-                        pos_ref = "\\mediumgap of GNr"
-                    elif f == 0:
-                        pos_ref = f"\\smallgap of G{match_nr}"
-                    else:
-                        pos_ref = f"0mm of G{match_nr}"
-                    file.write(f"\\createGame{{below={pos_ref}}}{{{match_nr+1}}}{{{team1.name}}}{{{team2.name}}}{{{f+1}}}{{{referee.name}}}{{{current_time[0]:2n}:{current_time[1]:02n}}}{{:}}\n")
-                    if f == 2:
-                        file.write("\n")
-                current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
-                current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
 
     def write_latex_groups(self, filename: str) -> None:
         with open(filename, 'w', encoding="utf-8") as file:

@@ -27,6 +27,8 @@
 
 \usepackage{pdflscape}
 
+\usepackage{tournamentstyle}
+
 \def\b{5.5cm} % width of box
 \def\c{5cm} % text width
 \def\d{7cm} % text width
@@ -49,7 +51,7 @@
     
     % print grouping
     \begin{landscape}
-        \center{\Huge{\textbf{Name of the tournament}}}
+        \center{\Huge{\textbf{\tournamentname}}}
         \center{\huge{\textbf{Groups}}} \\
         \vspace{3em}
         \renewcommand{\arraystretch}{1.25}
@@ -58,7 +60,7 @@
     \newpage
     
     % print schedule
-    \center{\Huge{\textbf{Name of the tournament}}}
+    \center{\Huge{\textbf{\tournamentname}}}
     \center{\huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}}
     \vspace{2em}
     

@@ -4,5 +4,6 @@ cache
 *.ilp
 *.mps
 *.aux
+*.synctex.gz
 *.fdb_latexmk
 *.fls

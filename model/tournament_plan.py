@@ -69,7 +69,7 @@ class TournamentPlan:
             current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
         return return_str
     
-    def get_team_schedule(self, team: Team, name_str_length: Optional[str] = None) -> str:
+    def get_team_schedule(self, team: Team, name_str_length: Optional[int] = None) -> str:
         return_str = ''
         name_str = team.name + ':'
         if name_str_length is None:

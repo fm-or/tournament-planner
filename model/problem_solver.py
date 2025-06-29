@@ -50,7 +50,7 @@ class ProblemSolver:
     def team_count(self) -> int:
         return sum(group.size for group in self._groups)
     
-    def _solve(self, max_consecutive_games: int, max_consecutive_pauses: int, max_court_deviation: int, prioritized_solver_str: Optional[str], output: bool) -> TournamentPlan:
+    def _solve(self, max_consecutive_games: int, max_consecutive_pauses: int, max_court_deviation: int, prioritized_solver_str: Optional[str], output: bool) -> Optional[TournamentPlan]:
         # variable definition
         x = dict() # matchups
         z = dict() # referees
@@ -164,7 +164,7 @@ class ProblemSolver:
               max_consecutive_pauses_fixed: Optional[int] = None,
               max_court_deviation_fixed: Optional[int] = None,
               prioritized_solver_str: Optional[str] = None,
-              output: Optional[bool] = False) -> TournamentPlan:
+              output: bool = False) -> TournamentPlan:
         max_consecutive_games_intervall = (1, self.max_group_size-1)  # maximum number of consecutive games any team plays {1, ..., teams-1}
         max_consecutive_pauses_intervall = (1, self.block_count-self.max_group_size+1)  # maximum number of consecutive pauses any team has {1, ... blocks-teams+1}
         max_court_deviation_intervall = (0, floor((self.max_group_size-1)/self.court_count)) # maximum deviation from the average court attendance {0, ..., floor((teams-1)/courts)}

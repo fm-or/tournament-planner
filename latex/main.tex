@@ -27,6 +27,8 @@
 
 \usepackage{pdflscape}
 
+\usepackage{tournamentstyle}
+
 \usepackage{datatool}% load data from csv files
 
 \def\b{5.5cm} % width of box
@@ -51,7 +53,7 @@
     
     % print grouping
     \begin{landscape}
-        \center{\Huge{\textbf{Name of the tournament}}}
+        \center{\Huge{\textbf{\tournamentname}}}
         \center{\huge{\textbf{Groups}}} \\
         \vspace{3em}
         \renewcommand{\arraystretch}{1.25}
@@ -60,7 +62,7 @@
     \newpage
     
     % print schedule
-    \center{\Huge{\textbf{Name of the tournament}}}
+    \center{\Huge{\textbf{\tournamentname}}}
     \center{\huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}}
     \vspace{2em}
     

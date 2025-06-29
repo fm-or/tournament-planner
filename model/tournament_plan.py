@@ -88,6 +88,13 @@ class TournamentPlan:
                 return_str += self.get_team_schedule(team, name_str_length)
         return return_str
     
+    def write_latex_style(self, filename: str, tournamentname: str, courtcount: int) -> None:
+        with open(filename, 'w', encoding="utf-8") as file:
+            file.write("\\ProvidesPackage{tournamentstyle}\n")
+            file.write(f"\\newcommand*{{\\tournamentname}}{{{tournamentname}}}\n")
+            file.write(f"\\newcommand*{{\\courtcount}}{{{courtcount}}}\n")
+            file.write("\\endinput")
+    
     def write_csv_schedule(self, filename: str) -> None:
         with open(filename, 'w', encoding="utf-8") as file:
             current_time = self._start_time

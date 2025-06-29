@@ -108,20 +108,22 @@ class TournamentPlan:
 
     def write_latex_groups(self, filename: str) -> None:
         with open(filename, 'w', encoding="utf-8") as file:
-            for group in self.groups:
-                file.write("\\begin{minipage}{0.25\\textwidth}\n")
-                file.write("\\centering\n")
-                file.write("\\LARGE{\n")
+            file.write("\\centering\n")
+            file.write("\\LARGE{\n")
+            file.write("\\setlength{\\tabcolsep}{1em}\n")
+            for g, group in enumerate(self.groups):
+                if g > 0:
+                    file.write("\\hspace{2em}\n")
                 file.write("\\begin{tabular}{|l|}\n")
                 file.write("\\hline\n")
-                file.write(f"\\textbf{{{group.name}}}\\\\ \n")
+                file.write(f"\\textbf{{{group.name}}}\\\\\n")
                 file.write("\\hline\n")
                 for team in group.teams:
-                    file.write(f"{team.name}\\\\ \n")
+                    file.write(f"{team.name}\\\\\n")
                 file.write("\\hline\n")
+                file.write("\\multicolumn{1}{c}{}\\\\\n")
                 file.write("\\end{tabular}\n")
-                file.write("}\n")
-                file.write("\\end{minipage}\n")
+            file.write("}\n")
     
     def __str__(self) -> str:
         return self.get_teams_schedule()

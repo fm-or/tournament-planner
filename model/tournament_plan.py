@@ -88,14 +88,14 @@ class TournamentPlan:
                 return_str += self.get_team_schedule(team, name_str_length)
         return return_str
     
-    def write_latex_style(self, filename: str, tournamentname: str, courtcount: int) -> None:
+    def write_latex_style(self, tournamentname: str, courtcount: int, filename: str = "latex/tournamentstyle.sty") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
             file.write("\\ProvidesPackage{tournamentstyle}\n")
             file.write(f"\\newcommand*{{\\tournamentname}}{{{tournamentname}}}\n")
             file.write(f"\\newcommand*{{\\courtcount}}{{{courtcount}}}\n")
             file.write("\\endinput")
     
-    def write_csv_schedule(self, filename: str) -> None:
+    def write_csv_schedule(self, filename: str = "latex/schedule.csv") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
             current_time = self._start_time
             file.write("Match Nr,Court,Team 1,Team 2,Referee,Time")
@@ -106,7 +106,7 @@ class TournamentPlan:
                 current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
                 current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
 
-    def write_latex_groups(self, filename: str) -> None:
+    def write_latex_groups(self, filename: str = "latex/groups.tex") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
             file.write("\\centering\n")
             file.write("\\LARGE{\n")

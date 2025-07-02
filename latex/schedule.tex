@@ -25,8 +25,6 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 
-\usepackage{pdflscape}
-
 \usepackage{tournamentstyle}
 
 \usepackage{datatool}% load data from csv files
@@ -51,24 +49,14 @@
 \begin{document}
     \pagenumbering{gobble}
     
-    % print grouping
-    \begin{landscape}
-        \center{\Huge{\textbf{\tournamentname}}}
-        \center{\huge{\textbf{Groups}}} \\
-        \vspace{3em}
-        \renewcommand{\arraystretch}{1.25}
-        \input{groups.tex}
-    \end{landscape}
-    \newpage
-    
     % print schedule
-    \center{\Huge{\textbf{\tournamentname}}}
-    \center{\huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}}
+    \centering
+    \Huge{\textbf{\tournamentname}} \\
+    \huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}
     \vspace{2em}
     
     \begin{figure}[H]
-    	
-        \centering
+    	\centering
         \begin{tikzpicture}
         	\def\smallgap{5mm}
         	\def\mediumgap{10mm}

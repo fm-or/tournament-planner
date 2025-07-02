@@ -1,29 +1,90 @@
-\centering
-\LARGE{
-\setlength{\tabcolsep}{1em}
-\begin{tabular}{|l|}
-\hline
-\textbf{Group A}\\
-\hline
-My Team\\
-Team 1\\
-Team 2\\
-Team 3\\
-Team 4\\
-\hline
-\multicolumn{1}{c}{}\\
-\end{tabular}
-\hspace{2em}
-\begin{tabular}{|l|}
-\hline
-\textbf{Group B}\\
-\hline
-Team 5\\
-Team 6\\
-Team 7\\
-Team 8\\
-Team 9\\
-\hline
-\multicolumn{1}{c}{}\\
-\end{tabular}
-}
+\documentclass[
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[a4paper,margin=20mm]{geometry}
+
+\usepackage[T1]{fontenc}% moderne Schriftkodierung
+\usepackage[utf8]{inputenc}% Sonderzeichen vieler verschiedener Sprachen gleichzeitig (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primär Deutsch und sekundär Englisch
+\usepackage[autostyle]{csquotes}% Anführungszeichen mit \enquote{} passen zur Sprache von babel
+\usepackage{lmodern}% Schriftfamilie latin modern basierend auf computer modern verträgt sich besser mit fontenc T1
+\usepackage{microtype}% Verbessert den Textsatz durch z.B. geringfügige Buchstaben-Skalierungen
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% löst Probleme mit floats 
+\usepackage[pdftex]{graphicx}
+
+\usepackage{float}
+
+\usepackage{ifthen}
+
+\usepackage{tikz}
+
+\usepackage{pdflscape}
+
+\usepackage{tournamentstyle}
+
+\usepackage{datatool}% load data from csv files
+\usepackage{xstring} % for string operations (optional but convenient)
+
+\begin{document}
+    \pagenumbering{gobble}
+    
+    % print grouping
+    \begin{landscape}
+    	\centering
+        \Huge{\textbf{\tournamentname}} \\
+        \huge{\textbf{Groups}} \\
+        \vspace{2em}
+        \renewcommand{\arraystretch}{1.25}
+        
+        % Load the group data from csv
+        \DTLloaddb{groupdata}{groups.csv}
+
+        % Extract unique groups into a temporary macro for iteration
+        \let\groupNames\empty
+
+        % Iterate over all rows to collect unique groups
+        \DTLforeach{groupdata}{\group=Group}{%
+        	% Check if the group has already been found
+        	\IfSubStr{\groupNames}{\group}{%
+        	}{%
+        		% Not found, add to list
+        		\ifx\groupNames\empty%
+        			% First entry, no leading comma
+        			\edef\groupNames{\group}%
+        		\else
+        			% Not first, so repeat the already found group names and insert a comma
+        			\edef\groupNames{\groupNames,\group}%
+        		\fi
+        	}%
+        }
+
+        % Now iterate over the unique groups and print tabulars
+        \LARGE
+        \setlength{\tabcolsep}{1em}
+        \foreach \thisgroup in \groupNames {%
+        	% Find the teams from this group and store them separated by \\
+        	\let\teamNames\empty%
+        	\DTLforeach{groupdata}{\group=Group,\team=Team}{%
+        		\ifthenelse{\equal{\group}{\thisgroup}}{
+       				\edef\teamNames{\teamNames\team\\}%
+        		}{}%
+        	}
+        	% Print the teams inside a tabular
+	        \begin{tabular}{|l|}
+		        \hline
+		        \textbf{\thisgroup}\\
+		        \hline
+		        \teamNames
+		        \hline
+		        \multicolumn{1}{c}{}\\
+	        \end{tabular}%
+	        \hspace{2em}
+        }
+        \hspace{-2.5em}
+    \end{landscape}
+\end{document}

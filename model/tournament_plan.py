@@ -106,24 +106,12 @@ class TournamentPlan:
                 current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
                 current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
 
-    def write_latex_groups(self, filename: str = "latex/groups.tex") -> None:
+    def write_csv_groups(self, filename: str = "latex/groups.csv") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
-            file.write("\\centering\n")
-            file.write("\\LARGE{\n")
-            file.write("\\setlength{\\tabcolsep}{1em}\n")
-            for g, group in enumerate(self.groups):
-                if g > 0:
-                    file.write("\\hspace{2em}\n")
-                file.write("\\begin{tabular}{|l|}\n")
-                file.write("\\hline\n")
-                file.write(f"\\textbf{{{group.name}}}\\\\\n")
-                file.write("\\hline\n")
+            file.write("Group,Team\n")
+            for group in self.groups:
                 for team in group.teams:
-                    file.write(f"{team.name}\\\\\n")
-                file.write("\\hline\n")
-                file.write("\\multicolumn{1}{c}{}\\\\\n")
-                file.write("\\end{tabular}\n")
-            file.write("}\n")
+                    file.write(f"{group.name},{team.name}\n")
     
     def __str__(self) -> str:
         return self.get_teams_schedule()

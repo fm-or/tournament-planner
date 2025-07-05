@@ -16,7 +16,7 @@ This tournament planner is a tool for organizing single-day round-robin tourname
 - Overall tournament schedule
 - Group overview
 - Team schedules
-- Match score sheets
+- Match score sheets: one is created for each match with the field, the playing teams and the referee team
 - Evaluation sheet
 
 ## Input parameters

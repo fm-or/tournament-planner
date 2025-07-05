@@ -13,6 +13,11 @@ This tournament planner creates an optimized schedule for single-day round-robin
 <sup> 1 </sup> this is realized by iteratively reducing the limit until no feasible schedule can be found.
 
 ## Output files
+- Overall tournament schedule
+- Group overview
+- Team schedules
+- Match score sheets
+- Evaluation sheet
 
 ## Input parameters
 - tournament name

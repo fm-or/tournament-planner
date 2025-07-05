@@ -11,10 +11,10 @@ This tournament planner creates an optimized schedule for single-day round-robin
 #### Input parameters
 - tournament name
 - groups of teams
-- Number of available courts
+- number of available courts
 - start time of tournament
 - match duration
-- break time between the games
+- break time between games
 
 #### Task list:
 - [x] working example including latex

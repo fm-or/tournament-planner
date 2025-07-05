@@ -4,10 +4,11 @@ This tournament planner creates an optimized schedule for single-day round-robin
 ### Fairness aspects considered
 - The matches of a team are distributed to the different courts.
 - The teams should be named first approximately the same number of times to ensure fair distribution of service or kick-off rights.
-- Maximum number of consecutive games[^1]
-- Maximum number of consecutive pauses[^1]
-- Maximum number of referee games[^1]
-[^1] this is realized by iteratively reducing the maximum amount ...
+- Maximum number of consecutive games <sup> 1 </sup>
+- Maximum number of consecutive pauses <sup> 1 </sup>
+- Maximum number of referee games <sup> 1 </sup>
+
+<sup> 1 </sup> this is realized by iteratively reducing the maximum amount ...
 
 #### Input parameters
 - tournament name

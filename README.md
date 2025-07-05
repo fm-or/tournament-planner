@@ -12,13 +12,22 @@ This tournament planner creates an optimized schedule for single-day round-robin
 
 <sup> 1 </sup> this is realized by iteratively reducing the limit until no feasible schedule can be found.
 
-#### Input parameters
+## Output files
+
+## Input parameters
 - tournament name
 - groups of teams
 - number of available courts
 - start time of tournament
 - match duration
 - break time between games
+
+## How to
+As the tournament planner used mixed-integer linear models ...
+
+## Further releases
+
+## Further technical details
 
 #### Task list:
 - [x] working example including latex

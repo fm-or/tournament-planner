@@ -1,5 +1,5 @@
 ## Tournament planner
-This tournament planner creates an optimized schedule for single-day round-robin tournaments with potential group divisions. The aim is to ensure fairness, for example by assigning refereeing duties evenly among the teams. Besides the overall tournament schedule, the planner generates supporting documents such as team-specific schedules and group overviews.
+This tournament planner creates an optimized schedule for single-day round-robin tournaments with potential group divisions. The aim is to ensure fairness, for example by limiting the number of refereeing duties for each team. Besides the overall tournament schedule, the planner generates supporting documents such as team-specific schedules and group overviews.
 
 ### Fairness aspects considered
 - The matches of a team are distributed to the different courts.

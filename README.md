@@ -19,7 +19,10 @@ This tournament planner is a tool for organizing single-day round-robin tourname
 - Match score sheets: one is created for each match with the field, the playing teams and the referee team
 - Evaluation sheet
 
-## Input parameters
+## How to Use
+As the tournament planner used mixed-integer linear models ...
+
+### Insert parameters in exampe.py
 - tournament name
 - groups of teams
 - number of available courts
@@ -27,16 +30,7 @@ This tournament planner is a tool for organizing single-day round-robin tourname
 - match duration
 - break time between games
 
-## How to
-As the tournament planner used mixed-integer linear models ...
 
 ## Further releases
 
 ## Further technical details
-
-#### Task list:
-- [x] working example including latex
-- [ ] review the solving performance
-- [ ] more comments
-- [ ] documentation
-- [ ] readme

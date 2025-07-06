@@ -34,3 +34,7 @@ As the tournament planner used mixed-integer linear models ...
 ## Further releases
 
 ## Further technical details
+$ Min. max_side_deviation+max_referee_games $
+UB for max_consecutive_games: group size-1
+UB for max_consecutive_pauses: nr of time blocks - group size +1
+UB for max_court_deviation

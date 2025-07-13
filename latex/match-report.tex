@@ -1,0 +1,106 @@
+\documentclass[
+	a4paper,
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[margin=20mm,top=25mm]{geometry}
+
+\usepackage[T1]{fontenc}% moderne Schriftkodierung
+\usepackage[utf8]{inputenc}% Sonderzeichen vieler verschiedener Sprachen gleichzeitig (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primär Deutsch und sekundär Englisch
+\usepackage[autostyle]{csquotes}% Anführungszeichen mit \enquote{} passen zur Sprache von babel
+\usepackage{lmodern}% Schriftfamilie latin modern basierend auf computer modern verträgt sich besser mit fontenc T1
+\usepackage{microtype}% Verbessert den Textsatz durch z.B. geringfügige Buchstaben-Skalierungen
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% löst Probleme mit floats
+\usepackage[pdftex]{graphicx}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+
+\usepackage{tournamentstyle}
+
+\usepackage{hyperref}% forms (\TextField)
+
+\renewcommand{\LayoutTextField}[2]{#2}
+
+\newcommand{\createPoint}[3]{% Position, Präfix, Punkt
+  \node[#1,draw,minimum height=8mm,minimum width=8mm] (#2-P#3) {#3};
+}
+\newcommand{\createPoints}[4]{% Position, Präfix, x, y
+    \coordinate[#1] (#2-P0);
+    \xdef\o{0}
+    \xdef\q{0}
+    \xdef\p{1}
+    \foreach \y in {1, ..., #4}{
+        \createPoint{below right=0mm of #2-P\o.south west}{#2}{\p}
+        \xdef\o{\p}
+        \pgfmathparse{int(\q+1)}
+        \xdef\q{\pgfmathresult}
+        \pgfmathparse{int(\p+1)}
+        \xdef\p{\pgfmathresult}
+        \foreach \x in {2, ..., #3}{
+            \createPoint{right=0mm of #2-P\q}{#2}{\p}
+            \pgfmathparse{int(\q+1)}
+            \xdef\q{\pgfmathresult}
+            \pgfmathparse{int(\p+1)}
+            \xdef\p{\pgfmathresult}
+        }
+    }   
+}
+
+\usepackage{amsmath}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \begin{center}
+        \huge{\textbf{\tournamentname}}\\
+        \vspace{1.5em}
+        {\LARGE\textbf{Report for match:} \TextField[bordercolor=black,borderstyle=U,borderwidth=1pt,charsize=1em,align=1,height=0.9em,width=3em,value=G11]{match}}\\
+        \vspace{1.5em}
+		{\Large\TextField[bordercolor=black,borderstyle=U,borderwidth=1pt,charsize=1em,align=2,height=0.9em,width=0.384\textwidth]{serve}
+		~\raisebox{1pt}{\textbf{vs.}}~
+		\TextField[bordercolor=black,borderstyle=U,borderwidth=1pt,charsize=1em,align=0,height=0.9em,width=.384\textwidth]{receive}}
+        \\[-.4em]
+        {\small serve\phantom{\Large~\raisebox{1pt}{\textbf{vs.}}~serve}}\\
+        \vspace{1.5em}
+        {\large\raisebox{1pt}{\textbf{Referee:}}~ \TextField[bordercolor=black,borderstyle=U,borderwidth=1pt,charsize=1em,align=0,height=0.9em,width=.387\textwidth]{referee}
+        \phantom{\raisebox{1pt}{\textbf{Referee:}}~}}
+    \end{center}
+    \begin{figure}[h]
+        \centering
+        \begin{tikzpicture}
+            \coordinate (origin) at (0, 0);
+            \createPoints{below right=0mm of origin}{T1}{5}{6}
+            \createPoints{above right=0mm and 20mm of T1-P5}{T2}{5}{6}
+
+            \node[left=6mm of T1-P1] (points) {\Large \textbf{Score:}};
+            \node[right=6mm of T2-P5] {\phantom{\Large \textbf{Score:}}};
+
+            \coordinate[below right=15mm and 0mm of T1-P26.south west] (result);
+            \draw[-] (result) -- (result -| T1-P30.south east);
+            \draw[-] (result -| T2-P26.south west) -- (result -| T2-P30.south east);
+            \node[anchor=193] at (result -| points.193) {\Large \textbf{Score:}};
+
+            \coordinate[below=15mm of result] (sets);
+            \draw[-] (sets) -- (sets -| T1-P30.south east);
+            \draw[-] (sets -| T2-P26.south west) -- (sets -| T2-P30.south east);
+            \node[anchor=196] at (sets -| points.196) {\Large \textbf{Sets:}};
+
+            \coordinate (midTop) at ($(T1-P5.north)!0.5!(T2-P1.north)$);
+            \coordinate (midBot) at ($(T1-P30.south)!0.5!(T2-P26.south)$);
+            \draw[-] (midTop) + (0, .5) -- (sets -| midBot) --  + (0, -.05);
+            
+            \coordinate[below=15mm of sets] (winner);
+            \draw[-] (winner) -- (winner -| T2-P30.south east);
+            \node[anchor=191] at (winner -| points.191) {\Large \textbf{Winner:}};
+            
+            \coordinate[below=15mm of winner] (description);
+
+            \node[anchor=west,align=left,text width=35em] at (description -| points.west) {In case of a tie, please play a deciding point. At the end of the game, please bring this report directly to the tournament management!};
+        \end{tikzpicture}
+    \end{figure}
+\end{document}

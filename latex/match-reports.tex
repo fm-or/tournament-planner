@@ -69,7 +69,7 @@
     % find the court ids and store them
     \let\uniqueCourts\empty
     \DTLforeach{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee,\time=Time}{
-    	\ifx\courts\empty
+    	\ifx\uniqueCourts\empty
     		% if no court has been stored yet, store the current court
     		\edef\uniqueCourts{\court}
     	\else

@@ -4,18 +4,21 @@ This tournament planner is a tool for organizing single-day round-robin tourname
 ## Fairness aspects considered
 ### Game play
 - Teams have a limit on the number of consecutive games they can play. 
-- Matches for each team are spread across different courts. 
-- The teams are named first approximately the same number of times to ensure fair distribution of service or kick-off rights.
+- The games for each team are spread across different courts. 
+- The teams are named first approximately the same number of times to ensure a fair distribution of service or kick-off rights.
 ### Other activities
 - Teams have a limit on consecutive pauses between games. 
 - There is a maximum number of games a team can referee. 
-- If there is more than one group, it is possible to decide to have only referees from other groups.
+- If there is more than one group, it is possible to only have referees from other groups.
 
 
 ## How to use
-The example file (example.py) consists of a problem instance with two groups consisting each of five teams. There are three courts available and the start of tournament is set to 18:30 (6:30 p.m). Each match lasts 0 hours and 10 minuten and inbetween games is a break of 0 hours and 5 minutes.
+The example file (example.py) contains an instance of the problem consisting of two groups, each comprising five teams. A tournament name is provided. There are three available courts and the tournament is set to start at 18:30 (6:30 p.m.). Each match lasts 0 hours and 10 minutes and inbetween games is a break of 0 hours and 5 minutes. Moreover, the option is used that teams do not referee games within their own group.
 
-Then, the following output files are created:
+The tournament plan is generated using a mixed-integer programming problem. This is solved by calling a solver from Python through PuLP. If a more powerful solver such as Gurobi or CPLEX is installed, it can be specified as a prioritized solver. However, this is not necessary.
+
+(TO-Do)
+The tournament schedule is then displayed on the console. In addition, .csv files are created to serve as input for the various provided LaTeX files. The resulting PDF files for the given example are linked below: 
 - Overall tournament schedule ([Example here](latex/schedule.pdf))
 - Group overview ([Example here](latex/groups.pdf))
 - Team schedules
@@ -26,14 +29,24 @@ Then, the following output files are created:
 ## Further Releases
 In the next release, we plan to enhance the tournament planner by introducing options such as external referees instead of referees from other teams.  Following this, we intend to include other tournament phases besides the round-robin system, such as placement games.
 
-## Used Mixed-Integer Programming Problem
-An optimal tournament schedule is generated using a mixed-integer programming approach that ensures fairness through a two-stage process. 
+## Solution Procedure and Mixed-Integer Programming Model
+The tournament schedule is generated using a mixed-integer programming model. Its objective minimizes the sum of the maximum number of referee assignments per team and the maximum imbalance in court side assignments per team. Constraints can ensure that referee duties are assigned only between teams from different groups when multiple groups exist.
 
-First, the maximum number of consecutive games and breaks, as well as the maximum deviation from an even court deviation per team, are determined. Then, these bounds are used to create a schedule that minimizes the maximum deviation in games played on different sides for each team, as well as the referee assignments per team. If there is more than one group, constraints can ensure that only teams from other groups take over referee duties.
+The remaining fairness measures are incorporated by iteratively adjusting their corresponding limits:
 
-The process repeatedly reduces the number of consecutive games and breaks (to minimize the deviations between the teams) and maximum deviation from an even court deviation until no feasible schedule results.
+- Maximum consecutive games allowed for each team,
+- Maximum consecutive breaks allowed for each team,
+- Maximum deviation from an even court assignment per team.
 
-A problem instance is characterized by the following sets: groups, which then include a set of teams, time blocks for games, and available courts.
+The procedure follows these steps:
+
+1. *Consecutive games*: Start with the minimum allowed maximum number of consecutive games. Keep breaks and court deviation limits at their upper bounds. If no feasible schedule exists, increment the consecutive games limit until feasibility is achieved. If feasible schedule is found, fix this value.
+
+2. *Consecutive breaks*: Start with the minimum allowed maximum, with court deviation limit at the upper bound. If infeasible, increment the break limit until a feasible schedule is found. If feasible schedule is found, fix this value.
+
+3. *Court deviation*: Start with the minimum deviation. If infeasible, increment as needed until feasibility. Once feasible, the tournament planner terminates with optimized referee assignments and minimized side deviations.
+
+To model the problem the following sets are used: groups, which then include a set of teams, time blocks for games, and available courts.
 
 Notation | Description
 ---: | :---
@@ -43,22 +56,21 @@ $b \in B$ | time block in set of time blocks with $B = \{1, 2, \ldots,  \mid B \
 $f \in F$ | court in set of courts
 
 
-The following parameters define restrictions for planning beyond organizational bounds e.g.  the maximum number of consecutive games and breaks for each team.
+The following parameters define restrictions for planning beyond organizational bounds:
 Parameters | Description
 ---: | :---
 $\overline{C}_{games}$ | maximum number of consecutive games allowed for each team
 $\overline{C}_{pauses}$ | maximum number of consecutive pauses allowed for each team
-$\overline{C}_{court}$ | maximum court deviation allowed for each team
+$\overline{C}_{court}$ | maximum court deviation from an equal assignment to courts allowed for each team
 
 
 The decision variables represent team assignments to games and refereeing duties on specific courts and time blocks. The integer variables $SD^{max}$ and $R^{max}$ record the maximum deviation in the field-side (or first-serve) allocations and the maximum number of referee games assigned to each team.
 Variable | Description
 ---: | :---
-$x_{b, f, g, t_1, t_2} \in \lbrace 0, 1\rbrace$ | Does team $t_1 \in T_g$ play against team $t_2 \in T_g$ on court $f$ in block $b$?
-$z_{b, f, g, t} \in \lbrace 0, 1\rbrace$ | Is team $t \in T_g$ the referee on court $f$ in block $b$?
+$x_{b, f, g, t_1, t_2} \in \lbrace 0, 1\rbrace$ | is equal to 1, if team $t_1 \in T_g$ plays against team $t_2 \in T_g$ on court $f$ in block $b$ and $t_1$ has the serve rights (equal to 0 otherwise).
+$z_{b, f, g, t} \in \lbrace 0, 1\rbrace$ | is equal to 1, if team $t \in T_g$ is the referee on court $f$ in block $b$ (equal to 0 otherwise).
 $SD^{max}$ $\in Z_{\geq 0}$ | Maximum deviation in games played on different sides for any team.
 $R^{max}$ $\in Z_{\geq 0}$ | Maximum number of referee games assigned to any team.
-
 
 
 ### Objective

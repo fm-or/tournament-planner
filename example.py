@@ -13,7 +13,7 @@ start_time = (18, 30)
 match_duration = (0, 10)
 break_duration = (0, 5)
 
-solver = ProblemSolver(groups, court_count, start_time, match_duration, break_duration)
+solver = ProblemSolver(groups, court_count, start_time, match_duration, break_duration, referee_own_group=False)
 tournament_plan = solver.solve(prioritized_solver_str="GUROBI", output=True)
 
 print(tournament_plan.get_tournament_schedule())

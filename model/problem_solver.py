@@ -13,7 +13,8 @@ class ProblemSolver:
                  court_count: int,
                  start_time: Tuple[int, int],
                  match_duration: Tuple[int, int],
-                 break_duration: Tuple[int, int]):
+                 break_duration: Tuple[int, int],
+                 referee_own_group: bool = False):
         self._groups = groups
         self._court_count = court_count
         self._start_time = start_time
@@ -21,6 +22,7 @@ class ProblemSolver:
         self._break_duration = break_duration
         self._game_count = sum(int(group.size*(group.size-1)/2) for group in groups)
         self._block_count = ceil(self._game_count/court_count)
+        self._referee_own_group = referee_own_group
 
     @property
     def group_count(self) -> int:
@@ -118,14 +120,14 @@ class ProblemSolver:
                     # at most one game per court
                     prob += lpSum(x[b, f, g, t, t2] for g, group in enumerate(self.groups) for t in range(group.size) for t2 in range(group.size) if t != t2) <= 1
             for f in range(self.court_count):
-                # exactly one team is a referee
-                prob += lpSum(z[b, f, g, t] for g, group in enumerate(self.groups) for t in range(group.size)) == 1
+                # exactly one team is a referee if a game is played
+                prob += lpSum(z[b, f, g, t] for g, group in enumerate(self.groups) for t in range(group.size)) == lpSum(x[b, f, g, t, t2] for g, group in enumerate(self.groups) for t in range(group.size) for t2 in range(group.size) if t != t2)
                 for g, group in enumerate(self.groups):
                     for t in range(group.size):
                         # a team can not play and be a referee in the same game
                         prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for t2 in range(group.size) if t != t2) <= 1 - z[b, f, g, t]
-                        # optional: a team can not be a referee in games of their own group
-                        if self.group_count >= 2:
+                        # if selected by referee_own_group, a team can not be a referee in games of their own group
+                        if not self._referee_own_group and self.group_count >= 2:
                             prob += lpSum(x[b, f, g, t2, t3] + x[b, f, g, t3, t2] for t2 in range(group.size) for t3 in range(group.size) if t2 != t3) <= 2*(1 - z[b, f, g, t])
 
         # solve

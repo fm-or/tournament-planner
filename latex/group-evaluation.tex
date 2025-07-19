@@ -1,0 +1,104 @@
+\documentclass[
+	a4paper,
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[landscape,margin=25mm]{geometry}
+
+\usepackage[T1]{fontenc}% moderne Schriftkodierung
+\usepackage[utf8]{inputenc}% Sonderzeichen vieler verschiedener Sprachen gleichzeitig (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primär Deutsch und sekundär Englisch
+\usepackage[autostyle]{csquotes}% Anführungszeichen mit \enquote{} passen zur Sprache von babel
+\usepackage{lmodern}% Schriftfamilie latin modern basierend auf computer modern verträgt sich besser mit fontenc T1
+\usepackage{microtype}% Verbessert den Textsatz durch z.B. geringfügige Buchstaben-Skalierungen
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% löst Probleme mit floats
+\usepackage[pdftex]{graphicx}
+
+\usepackage{multirow}
+
+\usepackage{tikz}% foreach
+
+\usepackage{tournamentstyle}
+
+\usepackage{datatool}% load data from csv files
+
+\usepackage{xstring}% \IfSubStr, \equal
+\usepackage{forloop}% \forloop
+
+% set the spacing for the tables
+\renewcommand{\arraystretch}{1.5}
+\setlength{\tabcolsep}{12pt}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \begin{center}
+    	\Huge{\textbf{\tournamentname}}\\
+    	\huge{\textbf{Group evaluation}}
+    \end{center}
+    \vspace{1em}
+    % load the schedule data from csv
+    \DTLloaddb{groupdata}{groups.csv}
+    % find the group names and store them
+    \let\uniqueGroups\empty
+    \DTLforeach{groupdata}{\group=Group}{%
+    	\ifx\uniqueGroups\empty
+	    	% if no court has been stored yet, store the current court
+	    	\edef\uniqueGroups{\group}
+    	\else
+	    	% otherwise and if the current court was not stored yet, append it with a comma
+	    	\IfSubStr{\uniqueGroups}{\group}{}{\edef\uniqueGroups{\uniqueGroups,\group}}
+    	\fi
+    }
+    % counter for the number of teams in a group
+    \newcounter{teamCount}
+    % loop counter for groups
+    \newcounter{g}
+    % loop counter for teams
+    \newcounter{t}
+    % loop over the groups
+    \foreach \currentGroup in \uniqueGroups {%
+    	% count the number of teams in the current group
+    	\setcounter{teamCount}{0}%
+    	\DTLforeach{groupdata}{\group=Group, \team=Team}{%
+    		\ifthenelse{\equal{\currentGroup}{\group}}{%
+    			\stepcounter{teamCount}%
+    		}{}%
+   		}%
+		\begin{table}[h]
+			\large
+			\centering
+			\begin{tabular}{l*{\arabic{teamCount}}{|c|c}}
+				\multirow{2}{*}{\textbf{\currentGroup}}
+				\DTLforeach{groupdata}{\group=Group, \team=Team}{%
+					\ifthenelse{\equal{\currentGroup}{\group}}{%
+						& \multicolumn{2}{|c}{\team}%
+					}{}%
+				}
+				\\
+				\DTLforeach{groupdata}{\group=Group, \team=Team}{%
+					\ifthenelse{\equal{\currentGroup}{\group}}{%
+						& Sets & Score%
+					}{}%
+				}
+				\\
+				\hline
+				\forloop{g}{1}{\value{g} < \value{teamCount}}{%
+					Game \arabic{g}%
+					\forloop{t}{0}{\value{t} < \value{teamCount}}{%
+						& : & :%
+					}%
+					\ifthenelse{\value{g} < \numexpr\value{teamCount}-1\relax}{\\}{\\\hline}%
+				}%
+				Result
+				\forloop{t}{0}{\value{t} < \value{teamCount}}{%
+					& : & :%
+				}%
+			\end{tabular}
+		\end{table}%
+		\vspace{3em}%
+	}
+\end{document}

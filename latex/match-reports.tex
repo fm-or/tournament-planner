@@ -1,0 +1,149 @@
+\documentclass[
+	a4paper,
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[margin=20mm,top=25mm]{geometry}
+
+\usepackage[T1]{fontenc}% moderne Schriftkodierung
+\usepackage[utf8]{inputenc}% Sonderzeichen vieler verschiedener Sprachen gleichzeitig (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primär Deutsch und sekundär Englisch
+\usepackage[autostyle]{csquotes}% Anführungszeichen mit \enquote{} passen zur Sprache von babel
+\usepackage{lmodern}% Schriftfamilie latin modern basierend auf computer modern verträgt sich besser mit fontenc T1
+\usepackage{microtype}% Verbessert den Textsatz durch z.B. geringfügige Buchstaben-Skalierungen
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% löst Probleme mit floats
+\usepackage[pdftex]{graphicx}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+
+\usepackage{tournamentstyle}
+
+\usepackage{datatool}% load data from csv files
+
+\usepackage{xstring}% \IfSubStr
+
+\newcommand{\createPoint}[3]{% Position, Präfix, Punkt
+  \node[#1,draw,minimum height=8.5mm,minimum width=8.5mm] (#2-P#3) {#3};
+}
+\newcommand{\createPoints}[4]{% Position, Präfix, x, y
+    \coordinate[#1] (#2-P0);
+    \xdef\o{0}
+    \xdef\q{0}
+    \xdef\p{1}
+    \foreach \y in {1, ..., #4}{
+        \createPoint{below right=0mm of #2-P\o.south west}{#2}{\p}
+        \xdef\o{\p}
+        \pgfmathparse{int(\q+1)}
+        \xdef\q{\pgfmathresult}
+        \pgfmathparse{int(\p+1)}
+        \xdef\p{\pgfmathresult}
+        \foreach \x in {2, ..., #3}{
+            \createPoint{right=0mm of #2-P\q}{#2}{\p}
+            \pgfmathparse{int(\q+1)}
+            \xdef\q{\pgfmathresult}
+            \pgfmathparse{int(\p+1)}
+            \xdef\p{\pgfmathresult}
+        }
+    }   
+}
+
+\usepackage{ulem}
+\usepackage{amsmath}
+%\usepackage{tabularx}
+%\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+%\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \DTLloaddb{scheduledata}{schedule.csv}% load the schedule data from csv
+    % find the court ids and store them
+    \let\uniqueCourts\empty
+    \DTLforeach{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee,\time=Time}{
+    	\ifx\courts\empty
+    		% if no court has been stored yet, store the current court
+    		\edef\uniqueCourts{\court}
+    	\else
+    		% otherwise and if the current court was not stored yet, append it with a comma
+    		\IfSubStr{\uniqueCourts}{\court}{}{\edef\uniqueCourts{\uniqueCourts,\court}}
+    	\fi
+    }
+    % print a match report page for each match sorted by court
+    % first loop over the unique courts
+    \foreach \currentCourt in \uniqueCourts {
+    	% then loop over all matches
+	    \DTLforeach{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee}{
+	    	% print the page only if the match court equals the current court (because of sorting)
+	    	\ifthenelse{\equal{\currentCourt}{\court}}{
+	    		% start the match report on a new page
+		        \newpage
+		        % fill in information about this match (tournament name, match id, teams, referee, court)
+		        \begin{center}
+		            \huge{\textbf{\tournamentname}}\\
+		            \vspace{1.25em}
+		            \setlength{\ULdepth}{3pt}
+		            \LARGE{\textbf{Match report: \uline{$\text{~\match~}$}}}\\
+		            \vspace{1.5em}
+		            \Large{
+		                \renewcommand{\arraystretch}{0.8}
+		                \begin{tabular}{@{}R{0.394\textwidth}@{}C{.25em}@{}C{.075\textwidth}@{}C{.25em}@{}L{.394\textwidth}@{}}
+		                     \textbf{\serving} && \textbf{vs.} && \textbf{\receiving} \\[-.1em]
+		                     \cline{1-2}\cline{4-5}
+		                     \small{serve}
+		                \end{tabular}
+		            }\\[1.5em]
+		            \large{
+		                \renewcommand{\arraystretch}{0.7}
+		                \begin{tabular}{@{}L{.128\textwidth}@{}C{.25em}@{}L{.394\textwidth}@{}C{.25em}@{}L{.347\textwidth}@{}}%.296
+		                     \textbf{Referee:} && \referee && \\
+		                     \cline{2-3}
+		                \end{tabular}\\[1.25em]
+		                \begin{tabular}{@{}L{.128\textwidth}@{}C{.25em}@{}C{.044\textwidth}@{}C{.25em}@{}L{.697\textwidth}@{}}%.296
+			                \textbf{Court:} && \court && \\
+			                \cline{2-3}
+		                \end{tabular}
+		            }
+		        \end{center}
+		        \vspace{-.5em}
+		        % draw the template for the results (score, winner)
+		        \begin{figure}[h]
+		            \centering
+		            \begin{tikzpicture}
+		                \coordinate (origin) at (0, 0);
+		                \createPoints{below right=0mm of origin}{T1}{5}{6}
+		                \createPoints{above right=0mm and 20mm of T1-P5}{T2}{5}{6}
+		    
+		                \node[left=6mm of T1-P1] (points) {\Large \textbf{Score:}};
+		                \node[right=6mm of T2-P5] {\phantom{\Large \textbf{Score:}}};
+		    
+		                \coordinate[below right=15mm and 0mm of T1-P26.south west] (result);
+		                \draw[-] (result) -- (result -| T1-P30.south east);
+		                \draw[-] (result -| T2-P26.south west) -- (result -| T2-P30.south east);
+		                \node[anchor=193] at (result -| points.193) {\Large \textbf{Score:}};
+		    
+		                \coordinate (midTop) at ($(T1-P5.north)!0.5!(T2-P1.north)$);
+		                \coordinate (midBot) at ($(T1-P30.south)!0.5!(T2-P26.south)$);
+		                \draw[-] (midTop) + (0, .5) -- (result -| midBot) --  + (0, -.05);
+		                
+		                \coordinate[below=15mm of result] (winner);
+		                \draw[-] (winner) -- (winner -| T2-P30.south east);
+		                \node[anchor=191] at (winner -| points.191) {\Large \textbf{Winner:}};
+		                
+		                \coordinate[below=15mm of winner] (description);
+		    
+		                \node[anchor=west,align=left,text width=35em] at (description -| points.west) {In the event of a tie, please play a deciding point.\\Please bring this report directly to the tournament organizers after the end of the game!};
+		            \end{tikzpicture}
+		        \end{figure}
+		    }{}
+	    }%
+	}
+\end{document}

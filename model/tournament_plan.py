@@ -108,9 +108,10 @@ class TournamentPlan:
 
     def write_csv_groups(self, filename: str = "latex/groups.csv") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
-            file.write(','.join(group.name for group in self.groups) + "\n")
-            for t in range(max(group.size for group in self.groups)):
-                file.write(','.join(group.teams[t].name if t < group.size else '' for group in self.groups ) + "\n")
+            file.write("Group,Team\n")
+            for group in self.groups:
+                for team in group.teams:
+                    file.write(f"{group.name},{team.name}\n")
 
     def __str__(self) -> str:
         return self.get_teams_schedule()

@@ -3,6 +3,10 @@ from math import floor
 
 from model.team import Team
 from model.group import Group
+from pdfrw import PdfReader, PdfWriter, PageMerge, PdfDict
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import io
 
 
 class TournamentPlan:

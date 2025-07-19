@@ -120,8 +120,8 @@ class ProblemSolver:
                     # at most one game per court
                     prob += lpSum(x[b, f, g, t, t2] for g, group in enumerate(self.groups) for t in range(group.size) for t2 in range(group.size) if t != t2) <= 1
             for f in range(self.court_count):
-                # exactly one team is a referee
-                prob += lpSum(z[b, f, g, t] for g, group in enumerate(self.groups) for t in range(group.size)) == 1
+                # exactly one team is a referee if a game is played
+                prob += lpSum(z[b, f, g, t] for g, group in enumerate(self.groups) for t in range(group.size)) == lpSum(x[b, f, g, t, t2] for g, group in enumerate(self.groups) for t in range(group.size) for t2 in range(group.size) if t != t2)
                 for g, group in enumerate(self.groups):
                     for t in range(group.size):
                         # a team can not play and be a referee in the same game

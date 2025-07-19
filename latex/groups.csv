@@ -1,6 +1,11 @@
-Group A,Group B
-My Team,Team 5
-Team 1,Team 6
-Team 2,Team 7
-Team 3,Team 8
-Team 4,Team 9
+Group,Team
+Group A,My Team
+Group A,Team 1
+Group A,Team 2
+Group A,Team 3
+Group A,Team 4
+Group B,Team 5
+Group B,Team 6
+Group B,Team 7
+Group B,Team 8
+Group B,Team 9

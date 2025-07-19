@@ -76,34 +76,34 @@ Each team $t_1$ plays any other team $t_2$ from the same group $g$.
 \sum_{b \in B} \sum_{f \in F} (x_{b,f,g,t_1,t_2} + x_{b,f,g,t_2,t_1}) = 1, \quad \forall g \in G, \forall t_1, t_2 \in T_g, t_1 \neq t_2
 ```
 
-Valid inequality: Each team $t \in T_g$ plays at maximum $\mid T_g \mid - 1$ games.
+Valid inequality: Each team $t_1 \in T_g$ plays at maximum $\mid T_g \mid - 1$ games.
 ```math
-\sum_{b \in B} \sum_{f \in F} \sum_{t2 \neq t} (x_{b, f, g, t, t2} + x_{b, f, g, t2, t}) = \mid T_g \mid - 1 \quad \forall g \in G, \forall t \in T_g
+\sum_{b \in B} \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t \neq t_2}} (x_{b, f, g, t_1, t_2} + x_{b, f, g, t_2, t_1}) = \mid T_g \mid - 1 \quad \forall g \in G, \forall t_1 \in T_g
 ```
 
-Each team $t$ plays in any block $b$ at maximum once.
+Each team $t_1$ plays in any block $b$ at maximum once.
 ```math
-\sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t \neq t_2}} \left( x_{b,f,g,t,t_2} + x_{b,f,g,t_2,t} \right) \leq 1 \quad \forall b \in B, \forall t \in T_g
+\sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t \neq t_2}} \left( x_{b,f,g,t_1,t_2} + x_{b,f,g,t_2,t_1} \right) \leq 1 \quad \forall b \in B, \forall g \in G, \forall t_1 \in T_g
 ```
 
 For each block $b$ and each court $f$ there is at maximum one game planned.
 ```math
-\sum_{g \in G} \sum_{t \in T_g} \sum_{\substack{t' \in T_g \\ t' \neq t}} x_{b,f,g,t,t'} \leq 1 \quad  \forall b \in B, \forall f \in F
+\sum_{g \in G} \sum_{t_1 \in T_g} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t_1}} x_{b,f,g,t_1,t_2} \leq 1 \quad  \forall b \in B, \forall f \in F
 ```
 
 
-For every block except the last all courts are in use.
+For every block $b$ except the last all courts are in use.
 ```math
-\sum_{f \in F} \sum_{g \in G} \sum_{t \in T_g} \sum_{\substack{t' \in T_g \\ t' \neq t}} x_{b,f,g,t,t'} = |F| \quad \forall b \in \{1, \ldots, \mid B \mid-1\} 
+\sum_{f \in F} \sum_{g \in G} \sum_{t_1 \in T_g} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t_1}} x_{b,f,g,t_1,t_2} = |F| \quad \forall b \in \{1, \ldots, \mid B \mid-1\} 
 ```
 
 #### Refereeing
-A team $t$ cannot play and referee in the same block $b$.
+A team $t_1$ cannot play and referee in the same block $b$.
 ```math
-\sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t \neq t_2}} \left( x_{b, f, g, t, t_2} + x_{b, f, g, t_2, t} \right) \leq 1 - \sum_{f \in F} z_{b, f, g, t} \quad  \forall b \in B, \forall t \in T_g
+\sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_1 \neq t_2}} \left( x_{b, f, g, t_1, t_2} + x_{b, f, g, t_2, t_1} \right) \leq 1 - \sum_{f \in F} z_{b, f, g, t_1} \quad  \forall b \in B, \forall g \in G, \forall t_1 \in T_g
 ```
 
-There is exactly one referee per court $f$ and block $f$.
+There is exactly one referee per court $f$ and block $b$.
 ```math
 \sum_{g \in G} \sum_{t \in T_g} z_{b, f, g, t} = 1  \quad  \forall b \in B, \forall f \in F
 ```

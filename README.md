@@ -112,9 +112,9 @@ A team $t_1$ cannot play and referee in the same block $b$.
 \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_1 \neq t_2}} \left( x_{b, f, g, t_1, t_2} + x_{b, f, g, t_2, t_1} \right) \leq 1 - \sum_{f \in F} z_{b, f, g, t_1} \quad  \forall b \in B, \forall g \in G, \forall t_1 \in T_g
 ```
 
-There is exactly one referee per court $f$ and block $b$.
+There is exactly one referee team $t_1$ per court $f$ and block $b$ if a game is played.
 ```math
-\sum_{g \in G} \sum_{t \in T_g} z_{b, f, g, t} = 1  \quad  \forall b \in B, \forall f \in F
+\sum_{g \in G} \sum_{t_1 \in T_g} z_{b, f, g, t_1} = \sum_{g \in G} \sum_{t_2 \in T_g} \sum_{\substack{t_3 \in T_g \\ t_3 \neq t_2}} x_{b,f,g,t_2,t_3}   \quad  \forall b \in B, \forall f \in F
 ```
 
 #### Fairness considerations

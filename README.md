@@ -1,13 +1,13 @@
 # Tournament Planner
-This tournament planner is a tool for organizing single-day round-robin tournaments with potential group divisions. It optimizes the tournament schedule to ensure fairness, for example by limiting the number of referee assignments for each team. Besides the overall tournament schedule, the planner generates supporting documents such as team-specific schedules and group overviews.
+This tournament planner is a tool for organizing single-day round-robin tournaments with optional group divisions. It optimizes the tournament schedule to ensure fairness, for example by limiting the number of referee assignments for each team. Besides the overall tournament schedule, the planner generates supporting documents such as team-specific schedules and group overviews.
 
-## Fairness aspects considered
+## Fairness Aspects considered
 ### Game play
 - Teams have a limit on the number of consecutive games they can play. 
 - The games for each team are spread across different courts. 
 - The teams are named first approximately the same number of times to ensure a fair distribution of service or kick-off rights.
 ### Other activities
-- Teams have a limit on consecutive pauses between games. 
+- Teams have a limit on consecutive breaks between games. 
 - There is a maximum number of games a team can referee. 
 - If there is more than one group, it is possible to only have referees from other groups.
 
@@ -46,7 +46,7 @@ The procedure follows these steps:
 
 3. *Court deviation*: Start with the minimum deviation. If infeasible, increment as needed until feasibility. Once feasible, the tournament planner terminates with optimized referee assignments and minimized side deviations.
 
-To model the problem the following sets are used: groups, which then include a set of teams, time blocks for games, and available courts.
+To model the problem the following sets are used: groups, each including a set of teams, time blocks for games, and available courts.
 
 Notation | Description
 ---: | :---
@@ -60,7 +60,7 @@ The following parameters define restrictions for planning beyond organizational 
 Parameters | Description
 ---: | :---
 $\overline{C}_{games}$ | maximum number of consecutive games allowed for each team
-$\overline{C}_{pauses}$ | maximum number of consecutive pauses allowed for each team
+$\overline{C}_{breaks}$ | maximum number of consecutive breaks allowed for each team
 $\overline{C}_{court}$ | maximum court deviation from an equal assignment to courts allowed for each team
 
 
@@ -75,7 +75,7 @@ $R^{max}$ $\in Z_{\geq 0}$ | Maximum number of referee games assigned to any tea
 
 ### Objective
 ```math
- \text{Min. } SD^{max}+R^{max}
+ \min SD^{max}+R^{max}
 ```
 
 ### Constraints
@@ -134,15 +134,15 @@ The total referee assignments for each team $t$ across all blocks $B$ and courts
 \sum_{b \in B} \sum_{f \in F}  z_{b,f,g,t} \leq R^{max} \quad \forall g \in G, \forall t \in T_g
 ```
 
-The upper limit on the maximum of consecutive games for each team $t_1$ to $\overline{C}_{games}$  is adhered to.
+The upper limit $\overline{C}_{games}$ on the maximum of consecutive games for each team $t_1$ is adhered to.
 ```math
-\sum_{b=1}^{\mid B \mid - \overline{C}_{games}} \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t }} (x_{b, f, g, t_1, t_2}+ x_{b, f, g, t_2, t_1}) \leq \overline{C}_{games} \quad \forall g \in G, \forall t_1 \in T_g
+\sum_{b_2=b_1}^{b_1 + \overline{C}_{games}} \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t_1 }} (x_{b_2, f, g, t_1, t_2}+ x_{b_2, f, g, t_2, t_1}) \leq \overline{C}_{games} \quad \forall b_1 \in \mid B \mid - \overline{C}_{games}, \forall g \in G, \forall t_1 \in T_g
 ```
 
-The upper bound for the number of maximum of consecutive games for each team $t_1$ to $\overline{C}_{pauses}$ is respected.
+The upper bound $\overline{C}_{breaks}$  on the maximum number of consecutive breaks for each team $t_1$ is respected.
 
 ```math
-\sum_{1}^{\mid B \mid - \overline{C}_{pauses}} \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t}} \left( x_{b,f,g,t_1,t_2} + x_{b,f,g,t_2,t_1} \right) \geq 1 \quad \forall g \in G, \forall t_1 \in T_g
+\sum_{b_2=b_1}^{b_1 + \overline{C}_{games}} \sum_{f \in F} \sum_{\substack{t_2 \in T_g \\ t_2 \neq t_1}} \left( x_{b_2,f,g,t_1,t_2} + x_{b_2,f,g,t_2,t_1} \right) \geq 1 \quad \forall b_1 \in \mid B \mid - \overline{C}_{games}, \forall g \in G, \forall t_1 \in T_g
 ```
 
 Each team plays at least a minimum number of games on each court. This is calculated as the largest group size minus one, divided evenly across all courts, reduced by an allowed court deviation.
@@ -153,5 +153,5 @@ Each team plays at least a minimum number of games on each court. This is calcul
 
 Optional: A team $t_1 \in T_g$ only does refereeing duties for teams of other groups (so not for teams $t_2,t_3 \in T_g$).
 ```math
-\sum_{\substack{t_2,t_3 \in T_g  \\ t_2 \neq t_3}} (x_{b, f, g, t_2, t_3} + x_{b, f, g, t_3, t_2}) \leq 2(1 - z_{b, f, g, t}) \quad  \forall b \in B, \forall f \in F, \forall g \in G, \forall t \in T_g
+\sum_{\substack{t_2 \in T_g}} \sum_{\substack{t_3 \in T_g  \\ t_2 \neq t_3}} (x_{b, f, g, t_2, t_3} + x_{b, f, g, t_3, t_2}) \leq 2(1 - z_{b, f, g, t}) \quad  \forall b \in B, \forall f \in F, \forall g \in G, \forall t_1 \in T_g
 ```

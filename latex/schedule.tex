@@ -32,10 +32,10 @@
 \def\b{5.5cm} % width of box
 \def\c{5cm} % text width
 \def\d{7cm} % text width
-\tikzset{titlenode/.style={draw, minimum width=\b, minimum height=0.8cm, align=left}}
-\tikzset{itemnode/.style={titlenode, text width=\c}}
-\tikzset{itemnodeWide/.style={titlenode, text width=\d}}
-\tikzset{smallnode/.style={draw, minimum height=0.8cm, minimum width= 1.5cm}}
+\tikzset{titlenode/.style={draw, minimum width=\b, minimum height=1.2cm, align=left}}
+\tikzset{itemnode/.style={titlenode, text width=\c, minimum height=1.2cm}}
+\tikzset{itemnodeWide/.style={titlenode, text width=\d, minimum height=1.2cm}}
+\tikzset{smallnode/.style={draw, minimum height=0.8cm, minimum width= 1.5cm, minimum height=1.2cm}}
 
 \newcommand{\createGame}[8]{%
   \node[smallnode, #1] (G#2) {\strut #2};
@@ -52,7 +52,7 @@
     % print schedule
     \centering
     \Huge{\textbf{\tournamentname}} \\
-    \huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Schedule and Template}}}
+    \huge{\textbf{\ifthenelse{\a=1}{Procedure and Results}{Second Group Phase - Schedule}}}
     \vspace{2em}
     
     \begin{figure}[H]
@@ -64,7 +64,7 @@
         	
             \coordinate (origin) at (0,0);
             
-            \createGame{below=0mm of origin}{Nr}{Serving}{Receiving}{}{Referee}{Time}{Points}% this is the header
+            \createGame{below=0mm of origin}{Nr}{Serving (first set)}{Receiving (first set)}{}{Referee}{Time}{Points}% this is the header
 
     		\DTLloaddb{scheduledata}{schedule.csv}% load the schedule data from csv
 			\let\prevTime\empty% initialize the time of the previous row as empty

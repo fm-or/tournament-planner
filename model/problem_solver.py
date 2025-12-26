@@ -13,14 +13,27 @@ class ProblemSolver:
                  court_count: int,
                  start_time: Tuple[int, int],
                  match_duration: Tuple[int, int],
+<<<<<<< Updated upstream
                  break_duration: Tuple[int, int]):
+=======
+                 break_duration: Tuple[int, int],
+                 referee_own_group: bool = False,
+                 distribute_team_games_across_fields: bool = False):
+>>>>>>> Stashed changes
         self._groups = groups
         self._court_count = court_count
         self._start_time = start_time
         self._match_duration = match_duration
         self._break_duration = break_duration
         self._game_count = sum(int(group.size*(group.size-1)/2) for group in groups)
+<<<<<<< Updated upstream
         self._block_count = ceil(self._game_count/court_count)
+=======
+        self._block_count = ceil(self._game_count/ (min(floor(sum(group.size for group in groups)/3),ceil(self._game_count/court_count),court_count) )) 
+        print("Nr of blocks:", self._block_count)
+        self._referee_own_group = referee_own_group
+        self._distribute_team_games_across_fields = distribute_team_games_across_fields
+>>>>>>> Stashed changes
 
     @property
     def group_count(self) -> int:
@@ -54,6 +67,10 @@ class ProblemSolver:
         # variable definition
         x = dict() # matchups
         z = dict() # referees
+        w = dict() # changes of court (wechel)
+        wB = dict() # is there a change from the previous to the current block
+
+        print("\n",self.block_count)
 
         for b in range(self.block_count):
             for f in range(self.court_count):
@@ -70,6 +87,15 @@ class ProblemSolver:
                     for t in range(group.size):
                         # is team t the referee in block b on court f?
                         z[b, f, g, t] = LpVariable(f"z[{b},{f},{g},{t}]", 0, 1, LpBinary)   # variable for soft constraint
+
+        for b in range(1, self.block_count):
+            for g, group in enumerate(self.groups):
+                for t in range(group.size):
+                    w[b, g, t] = LpVariable(f"w[{b},{g},{t}]", 0, 1, LpBinary)
+
+        for b in range(self.block_count):
+            wB[b] = LpVariable(f"wB[{b}]", 0, 1, LpBinary)
+
         max_side_deviation = LpVariable("z1", 0, self.max_group_size-1, LpInteger)
         max_referee_games = LpVariable("z2", ceil(self.game_count/self.team_count), self.block_count-self.max_group_size+1, LpInteger) # todo
 
@@ -90,8 +116,9 @@ class ProblemSolver:
                 # optional: each team plays groups[g]-1 games
                 prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(self.block_count) for f in range(self.court_count) for t2 in range(group.size) if t != t2) == group.size - 1
                 # each team plays at least floor((max(groups)-1)/courts) on each court: todo
-                for f in range(self.court_count):
-                    prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(self.block_count) for t2 in range(group.size) if t != t2) >= floor((self.max_group_size-1)/self.court_count) - max_court_deviation
+                if self._distribute_team_games_across_fields:
+                    for f in range(self.court_count):
+                        prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(self.block_count) for t2 in range(group.size) if t != t2) >= floor((self.max_group_size-1)/self.court_count) - max_court_deviation
                 # each team plays at most once per block
                 for b in range(self.block_count):
                     prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for f in range(self.court_count) for t2 in range(group.size) if t != t2) <= 1
@@ -128,9 +155,44 @@ class ProblemSolver:
                         if self.group_count >= 2:
                             prob += lpSum(x[b, f, g, t2, t3] + x[b, f, g, t3, t2] for t2 in range(group.size) for t3 in range(group.size) if t2 != t3) <= 2*(1 - z[b, f, g, t])
 
+        #for g, group in enumerate(self.groups):
+        #    for t in range(group.size):
+        #        for b in range(1, self.block_count):
+        #            for f in range(self.court_count):
+        #                prob += (lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for t2 in range(group.size) if t != t2) 
+        #                         + z[b, f, g, t] 
+        #                        + lpSum(x[b-1, f2, g, t, t2]+ x[b-1, f2, g, t2, t] for f2 in range(self.court_count) for t2 in range(group.size) if t != t2 and f2 != f)  
+        #                        + lpSum(z[b-1, f2, g, t]  for f2 in range(self.court_count) if f2 != f)
+        #                        -1) <= w[b, g, t]
+
+        #for g, group in enumerate(self.groups):
+        #    for t in range(group.size):
+        #         prob += lpSum(w[b, g, t] for b in range(1, self.block_count)) <= 1 #self.block_count - 6
+
+        #for b in range(1, self.block_count):
+        #    prob += lpSum(w[b, g, t] for g, group in enumerate(self.groups) for t in range(group.size)) <= wB[b]* 10
+
+        #prob += lpSum(wB[b] for b in range(1, self.block_count) if b!=6) <= 0
+
+        #wB[self.block_count-1] = 0
+
+         #consecutive games and referee duties (not more 4 in 5 slots)
+        for g, group in enumerate(self.groups):
+            for t in range(group.size):
+               for b in range(0, self.block_count-4): # look at five consecutive slot
+                    prob += (lpSum(x[b2, f, g, t, t2] + x[b2, f, g, t2, t] for b2 in range(b, b+4) for f in range(self.court_count) for t2 in range(group.size) if t != t2) 
+                             + lpSum(z[b2, f, g, t] for b2 in range(b, b+4) for f in range(self.court_count))) <= 3
+        
+        # dedicated court for teams
+        for g, group in enumerate(self.groups):
+            for b in range(self.block_count):
+                prob += (lpSum(x[b, f, g, t, t2] for f in range(self.court_count) for t in range(group.size) for t2 in range(group.size) if t != t2 and f != g) 
+                         + lpSum(z[b, f, g, t] for f in range(self.court_count) for t in range(group.size) if f != g)) <= 0
+                    
+                       
         # solve
         if output:
-            print(f"Solving problem configuration ({max_consecutive_games},{max_consecutive_pauses},{max_court_deviation}).  ", end='\r')
+            print(f"Solving problem configuration ({max_consecutive_games},{max_consecutive_pauses},{max_court_deviation}).  \n"), #end='\r'
         # check for solvers
         selected_solver = PULP_CBC_CMD(msg=0)
         if prioritized_solver_str is not None and prioritized_solver_str in listSolvers():
@@ -156,6 +218,7 @@ class ProblemSolver:
                     if side1 is not None:
                         block.append((side1, side2, referee))
                 plan.append(block)
+
             return TournamentPlan(plan, self.groups, self._start_time, self._match_duration, self._break_duration)
         return None
 

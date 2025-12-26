@@ -108,10 +108,38 @@ class TournamentPlan:
 
     def write_csv_groups(self, filename: str = "latex/groups.csv") -> None:
         with open(filename, 'w', encoding="utf-8") as file:
+<<<<<<< Updated upstream
             file.write("Group,Team\n")
             for group in self.groups:
                 for team in group.teams:
                     file.write(f"{group.name},{team.name}\n")
     
+=======
+            file.write(','.join(group.name for group in self.groups) + "\n")
+            for t in range(max(group.size for group in self.groups)):
+                file.write(','.join(group.teams[t].name if t < group.size else '' for group in self.groups ) + "\n")
+
+    def analyse_schedule(self) -> None:
+        for team in self.teams:
+            number_changes = 0
+            previous_position = None
+            for block_index, block in enumerate(self._plan):
+                position_found = None
+                for nr, court in enumerate(block):
+                    for r, team_r in enumerate(court):
+                        if team == team_r:
+                            position_found = nr  
+                            break
+                    if position_found is not None:
+                        break
+                
+                if block_index > 0:
+                    if position_found != previous_position and position_found is not None and previous_position is not None:
+                        number_changes = number_changes +1
+                
+                previous_position = position_found
+            print("Team" , team.name,":", number_changes, "of changes")
+
+>>>>>>> Stashed changes
     def __str__(self) -> str:
         return self.get_teams_schedule()

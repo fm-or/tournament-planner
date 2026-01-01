@@ -1,0 +1,165 @@
+\documentclass[
+    a4paper,
+    headinclude=false,
+    footinclude=false,
+]{scrartcl}
+
+\usepackage[landscape,margin=25mm]{geometry}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,main=ngerman]{babel}
+\usepackage[autostyle]{csquotes}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{scrhack}
+\usepackage[pdftex]{graphicx}
+
+\usepackage{ifthen}
+\usepackage{tikz}
+\usepackage{pgffor}
+
+\usepackage{datatool}
+\usepackage{xstring}
+\usepackage{multirow}
+\usepackage{etoolbox}
+
+\usepackage{tournamentstyle}
+
+\begin{document}
+\pagenumbering{gobble}
+
+ \center{\Huge{\textbf{\tournamentname}}}
+\center{\huge{\textbf{Evaluation sheet}}}
+\vspace{1em}
+
+% Load CSV data
+\DTLloaddb{groupdata}{groups.csv}
+
+\newcount\countteams
+
+\newcommand{\getTeamCount}[2]{% #1=Gruppennamen string
+  \countteams=0
+  \DTLforeach{groupdata}{\group=Group}{%
+    % If \group is NOT in #1, then increment count
+    \IfSubStr{#1}{\group}{}{%
+      \advance\countteams by 1
+    }%
+  }%
+  \edef#2{\the\countteams}% store the count into #2
+}
+
+\newcommand{\buildColSpec}[1]{%
+  \def\tabcols{l}%
+  \newcount\countteam
+  \countteam=#1
+  \loop
+    \edef\tabcols{\tabcols |c|c}%
+    \advance\countteam by -1
+  \ifnum\countteam>0
+  \repeat
+}
+
+\makeatletter
+
+\newcommand{\buildHeaderRow}[1]{%
+  \def\headerrow{}%
+  \count0=0
+  \loop
+    \edef\temp{& Sets & Points}%
+    \xdef\headerrow{\headerrow \temp}%
+    \advance\count0 by 1
+  \ifnum\count0<#1
+  \repeat
+}
+
+
+\newcommand{\buildAllGameRows}[1]{%
+  \def\gamerows{}%
+  \newcount\countRow
+  \countRow=1
+  \loop
+  	\def\tempColumn{}%
+    \newcount\countColumn
+  	\countColumn=0
+  	{
+    \loop
+      \xdef\tempColumn{\tempColumn & : & : }%
+      \advance\countColumn by 1
+    \ifnum\countColumn<5
+    \repeat
+    }
+    \edef\tempRow{Game \the\countRow \tempColumn \\}%
+    \edef\gamerows{\gamerows \tempRow}%
+    \advance\countRow  by 1
+  \ifnum\countRow<5
+  \repeat
+}
+
+
+\newcommand{\buildResultsRow}[1]{%
+  \def\resultsrow{Results}%
+  \count0=0
+  \loop
+    \edef\temp{& : & :}%
+    \xdef\resultsrow{\resultsrow \temp}%
+    \advance\count0 by 1
+  \ifnum\count0<#1
+  \repeat
+}
+
+\newcommand{\grouptable}[1]{%
+  \renewcommand{\arraystretch}{1.5}%
+  \def\teamHeader{}%
+\DTLforeach{groupdata}{\group=Group,\team=Team}{%
+\ifdefstring{\group}{#1}{%
+    \protected@xappto\teamHeader{& \noexpand\multicolumn{2}{|c}{\team} }%
+   % \edef\teamHeader{\teamHeader & \noexpand\multicolumn{2}{c}{\team} }%
+  }{%
+    % nichts tun, falls ungleich
+  }%
+}%
+  \setlength{\tabcolsep}{12pt}%
+  \getTeamCount{#1}{\teamcount}
+  \buildColSpec{\teamcount}
+  \buildHeaderRow{\teamcount}
+  \buildAllGameRows{\teamcount}
+  \buildResultsRow{\teamcount}
+  \begin{table}[h]
+    \large
+    \centering
+    \begin{tabular}{\tabcols}
+      \multirow{2}{*}{\textbf{#1}} \teamHeader \\
+      \headerrow \\
+      \hline
+      \gamerows
+      \hline
+      \resultsrow \\
+    \end{tabular}
+  \end{table}
+  \vspace{3em}%
+}
+\makeatother
+
+% Extract unique groups and call \grouptable for each
+\makeatletter
+\let\groupNames\empty
+
+\DTLforeach{groupdata}{\group=Group}{%
+  \IfSubStr{\groupNames}{\group}{}{% if not present
+    \ifx\groupNames\empty
+      \edef\groupNames{\group}%
+    \else
+      \edef\groupNames{\groupNames,\group}%
+    \fi
+  }%
+}
+\makeatother
+
+%\def\groupNames{Group A,Group B}
+% Iterate over unique groups and print their tables
+\foreach \g in \groupNames {%
+  \expandafter\grouptable\expandafter{\g}%
+}
+
+\end{document}

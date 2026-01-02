@@ -1,0 +1,187 @@
+\documentclass[
+	a4paper,
+	headinclude=false,
+	footinclude=false,
+	]{scrartcl}
+    
+\usepackage[margin=20mm,top=25mm, landscape]{geometry}
+
+\usepackage[T1]{fontenc}% modern font encoding
+\usepackage[utf8]{inputenc}% Special characters from many different languages simultaneously (€, ° usw.)
+\usepackage[english,main=ngerman]{babel}% Primarily German and secondarily English
+\usepackage[autostyle]{csquotes}% Quotation marks with \enquote{} match the language of babel
+\usepackage{lmodern}% Latin Modern font family based on Computer Modern is more compatible with fontenc T1
+\usepackage{microtype}% Improves text composition, e.g., by slightly scaling letters
+
+\renewcommand{\familydefault}{\sfdefault}
+    
+\usepackage{scrhack}% solves problems with floats
+\usepackage[pdftex]{graphicx}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,calc}
+
+\usepackage{float}
+
+\usepackage{tournamentstyle}
+
+\usepackage{datatool}% load data from csv files
+
+\usepackage{xstring}% \IfSubStr
+
+\usepackage{ifthen}
+
+\def\b{5.5cm} % width of box
+\def\c{5cm} % text width
+\def\d{7cm} % text width
+\tikzset{titlenode/.style={draw, minimum width=\b, minimum height=0.8cm, align=left}}
+\tikzset{itemnode/.style={titlenode, text width=\c}}
+\tikzset{itemnodeWide/.style={titlenode, text width=\d}}
+\tikzset{smallnode/.style={draw, minimum height=0.8cm, minimum width= 2cm}}
+
+\newcommand{\createGame}[8]{%
+  \node[smallnode, #1] (G#2) {\strut #7};
+    \node[smallnode, right=0mm of G#2] (G#2court) {\strut #5};
+  \node[itemnode, right=0mm of G#2court] (G#2serve) {\strut #3};
+  \node[itemnode,  right=0mm of G#2serve] (G#2receive) {\strut #4};
+  \node[itemnode, right=0mm of G#2receive] (G#2referee) {\strut #6};
+  % points are not of relevance in this file
+ % \node[smallnode, text width=16mm, align =center, right=0mm of G#2referee] (G#2info) {\strut \ifthenelse{\a=1}{#8}{#7}}; 
+}
+
+\DTLloaddb{scheduledata}{schedule.csv}% load the schedule data from csv
+
+\DTLloaddb{groupdata}{groups.csv} % load group data from csv
+
+\begin{document}
+\pagenumbering{gobble} % no page numbers
+
+% loop over entries in the database 'groupdata', extracting a list of teams
+\makeatletter
+\let\teamNames\empty
+\DTLforeach{groupdata}{\group=Group,\team=Team}{%
+  \IfSubStr{\teamNames}{\team}{}{% if not present
+    \ifx\teamNames\empty
+      \edef\teamNames{\team}%
+    \else
+      \edef\teamNames{\teamNames,\team}%
+    \fi
+  }%
+}
+\makeatother
+
+\newcounter{zeitslotzaehler}
+
+% loop through each team and print its schedule
+\foreach \team in \teamNames {%
+\setcounter{zeitslotzaehler}{0}
+
+% print header for the schedule of the current team
+\begin{center}
+		\huge{\textbf{\tournamentname}}\\
+		\vspace{1.25em}
+		\LARGE{\textbf{Schedule of \team}}\\
+\end{center}
+
+\begin{figure}[H]
+ \centering
+   \begin{tikzpicture}
+   \def\smallgap{5mm}
+   \def\mediumgap{10mm}
+   \def\largegap{15mm}
+        	
+   \coordinate (origin) at (0,0);
+
+% print header
+\createGame{below=0mm of origin}{Nr}{Serving}{Receiving}{Court}{Referee}{Time}{Points}% this is the header
+
+
+\let\prevTime\empty
+\let\timeOfLastMatch\empty
+
+% loop through all matches
+\DTLforeach{scheduledata}{\match=Match Nr,\court=Court,\serving=Team 1,\receiving=Team 2,\referee=Referee,\time=Time}
+{% 
+
+% check whether there was no match involving the current team in the previous slot
+\ifthenelse{\not\equal{\prevTime}{\time} \AND \not\equal{\prevTime}{\timeOfLastMatch}}
+{
+
+% if this is the case, print an empty row containing only the time of the previous slot.
+\stepcounter{zeitslotzaehler}
+\ifnum\value{zeitslotzaehler}>1
+   \expandafter\createGame
+    \expandafter{below=0mm of G\number\numexpr\value{zeitslotzaehler}-1\relax}{\arabic{zeitslotzaehler}}{}{}{}{}{\prevTime}{}%
+\else
+    \expandafter\createGame
+    \expandafter{below=0mm of GNr}{\arabic{zeitslotzaehler}}{}{}{}{}{\prevTime}{}%
+\fi
+}
+{
+%
+}
+
+% check if current match involves the current team
+  \ifthenelse{\equal{\serving}{\team} \OR \equal{\receiving}{\team} \OR \equal{\referee}{\team}}{%
+  
+\stepcounter{zeitslotzaehler} % count up first
+\global\let\timeOfLastMatch\time% update time of last match
+
+% define entries to highlight the current team in bold
+\def\printServing{\serving}
+\def\printReceiving{\receiving}
+\def\printReferee{\referee}
+\ifthenelse{\equal{\serving}{\team}}{%
+	\def\printServing{\textbf{\serving}}
+}{%
+   % 
+}%
+\ifthenelse{\equal{\receiving}{\team}}{%
+	\def\printReceiving{\textbf{\receiving}}
+}{%
+   % 
+}%
+\ifthenelse{\equal{\referee}{\team}}{%
+	\def\printReferee{\textbf{\referee}}
+}{%
+   % 
+}%
+
+% print match
+ \ifnum\value{zeitslotzaehler}>1
+   \expandafter\createGame
+    \expandafter{below=0mm of G\number\numexpr\value{zeitslotzaehler}-1\relax}{\arabic{zeitslotzaehler}}{\printServing}{\printReceiving}{Court \court}{\printReferee}{\time}{:}%
+\else
+    \expandafter\createGame
+    \expandafter{below=0mm of GNr}{\arabic{zeitslotzaehler}}{\printServing}{\printReceiving}{Court \court}{\printReferee}{\time}{:}%
+\fi
+
+  }{%
+    % 
+  }%
+\global\let\prevTime\time% the time of the previous row is updated
+}%
+
+% if in the last slot there was no match where the current team was involved, an additional row must be printed
+\ifthenelse{\not\equal{\prevTime}{\timeOfLastMatch}}
+{
+\stepcounter{zeitslotzaehler}
+\ifnum\value{zeitslotzaehler}>1
+   \expandafter\createGame
+    \expandafter{below=0mm of G\number\numexpr\value{zeitslotzaehler}-1\relax}{\arabic{zeitslotzaehler}}{}{}{}{}{\prevTime}{}%
+\else
+    \expandafter\createGame
+    \expandafter{below=0mm of GNr}{\arabic{zeitslotzaehler}}{}{}{}{}{\prevTime}{}%
+\fi
+}
+{
+%
+}
+
+\end{tikzpicture}
+\end{figure}
+    
+\newpage
+}
+
+\end{document}

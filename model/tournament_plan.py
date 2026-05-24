@@ -7,6 +7,7 @@ from pdfrw import PdfReader, PdfWriter, PageMerge, PdfDict
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import io
+import os
 
 
 class TournamentPlan:
@@ -93,6 +94,15 @@ class TournamentPlan:
         return return_str
     
     def write_latex_style(self, tournamentname: str, courtcount: int, filename: str = "latex/tournamentstyle.sty") -> None:
+        if filename is None:
+            filename = os.path.join("latex", "tournamentstyle.sty")
+        else:
+            filename = os.path.normpath(filename)
+
+        dirname = os.path.dirname(filename)
+        if dirname and not os.path.exists(dirname):
+             os.makedirs(dirname)
+
         with open(filename, 'w', encoding="utf-8") as file:
             file.write("\\ProvidesPackage{tournamentstyle}\n")
             file.write(f"\\newcommand*{{\\tournamentname}}{{{tournamentname}}}\n")

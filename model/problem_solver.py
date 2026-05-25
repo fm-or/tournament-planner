@@ -21,7 +21,6 @@ class ProblemSolver:
         self._match_duration = match_duration
         self._break_duration = break_duration
         self._game_count = sum(int(group.size*(group.size-1)/2) for group in groups)
-        #self._block_count = ceil(self._game_count / (min( floor(sum(group.size for group in groups) / 3), ceil(self._game_count / court_count),court_count))) -> is now also part of the optimization
         self._referee_own_group = referee_own_group
 
     @property
@@ -39,10 +38,6 @@ class ProblemSolver:
     @property
     def game_count(self) -> int:
         return self._game_count
-    
-    #@property -> is now also part of the optimization
-    #def block_count(self) -> int:
-    #    return self._block_count
     
     @property
     def court_count(self) -> int:

@@ -96,7 +96,7 @@ class ProblemSolver:
                     # only games at allowed courts i.e. forbid matches for disallowed courts
                     disallowed_courts = [court for court in range(self.court_count) if court not in group.courts]
                     for f in disallowed_courts:
-                        prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for t2 in range(group.size)if t != t2) == 0
+                        prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for t2 in range(group.size) if t != t2) == 0
                 # each team plays at most once per block
                 for b in range(max_blocks):
                     prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for f in range(self.court_count) for t2 in range(group.size) if t != t2) <= 1

@@ -5,8 +5,8 @@ from model.problem_solver import ProblemSolver
 tournament_name = "Our tournament"
 my_team = Team("My Team")
 groups = [
-    Group("Group A", [my_team] + Team.create_incrementing_teams(4, start_index=1), courts=[0]),
-    Group("Group B", Team.create_incrementing_teams(5, start_index=5), courts=[2])
+    Group("Group A", [my_team] + Team.create_incrementing_teams(4, start_index=1), courts=[1,2]),
+    Group("Group B", Team.create_incrementing_teams(5, start_index=5), courts=[2,3])
 ]
 court_count = 3
 start_time = (18, 30)

@@ -1,13 +1,22 @@
 from typing import List
+from typing import Optional
 
 from model.team import Team
 
 
 class Group:
 
-    def __init__(self, name: str, teams: List[Team]):
+    def __init__(self, name: str, teams: List[Team], courts: Optional[List[int]] = None):
         self._name = name
         self._teams = teams
+        if courts:
+            self._courts = [c - 1 for c in courts]
+        else:
+            self._courts = []
+
+    @property
+    def courts(self) -> List[int]:
+        return self._courts
     
     @property
     def name(self) -> str:

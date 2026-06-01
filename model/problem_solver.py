@@ -48,6 +48,8 @@ class ProblemSolver:
         return sum(group.size for group in self._groups)
     
     def _solve(self, max_blocks: int, max_consecutive_games: int, max_consecutive_tasks: int, max_consecutive_pauses: int, max_court_deviation: int, prioritized_solver_str: Optional[str], output: bool) -> Optional[TournamentPlan]:
+        no_court_restrictions = all(len(group.courts) == 0 for group in self.groups)
+        
         # variable definition
         x = dict() # matchups
         z = dict() # referees
@@ -86,9 +88,15 @@ class ProblemSolver:
                                 prob += x[b, f, g, t, t2] + x[b, f, g, t2, t] <= 1
                 # optional: each team plays groups[g]-1 games
                 prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for f in range(self.court_count) for t2 in range(group.size) if t != t2) == group.size - 1
-                # each team plays at least floor((max(groups)-1)/courts) on each court: todo
-                for f in range(self.court_count):
-                    prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for t2 in range(group.size) if t != t2) >= floor((self.max_group_size-1)/self.court_count) - max_court_deviation
+                if no_court_restrictions:
+                    # if there are no court restrictions among any team, each team plays at least floor((max(groups)-1)/courts) on each court
+                    for f in range(self.court_count):
+                        prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for t2 in range(group.size) if t != t2) >= floor((self.max_group_size-1)/self.court_count) - max_court_deviation
+                else:
+                    # only games at allowed courts i.e. forbid matches for disallowed courts
+                    disallowed_courts = [court for court in range(self.court_count) if court not in group.courts]
+                    for f in disallowed_courts:
+                        prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for b in range(max_blocks) for t2 in range(group.size) if t != t2) == 0
                 # each team plays at most once per block
                 for b in range(max_blocks):
                     prob += lpSum(x[b, f, g, t, t2] + x[b, f, g, t2, t] for f in range(self.court_count) for t2 in range(group.size) if t != t2) <= 1
@@ -144,7 +152,8 @@ class ProblemSolver:
             for b in range(max_blocks):
                 block = []
                 for f in range(self.court_count):
-                    side1, side2, referee = None, None, None
+                    side1, side2, referee, court = None, None, None, None
+                    court = f
                     for g, group in enumerate(self.groups):
                         for t, team in enumerate(group.teams):
                             if sum(x[b, f, g, t, t2].value() for t2 in range(group.size) if t != t2) > 0.99:
@@ -154,7 +163,7 @@ class ProblemSolver:
                             if z[b, f, g, t].value() > 0.99:
                                 referee = team
                     if side1 is not None:
-                        block.append((side1, side2, referee))
+                        block.append((side1, side2, referee, court))
                 plan.append(block)
             return TournamentPlan(plan, self.groups, self._start_time, self._match_duration, self._break_duration)
         return None

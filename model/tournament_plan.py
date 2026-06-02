@@ -114,10 +114,10 @@ class TournamentPlan:
             current_time = self._start_time
             file.write("Match Nr,Court,Team 1,Team 2,Referee,Time")
             match_nr = 0
-            for b, block in enumerate(self._plan):
+            for block in self._plan:
                 for team1, team2, referee, court in block:
-                    match_nr = match_nr + 1
                     file.write(f"\n{match_nr+1},{court+1},{team1.name},{team2.name},{referee.name},{current_time[0]:02n}:{current_time[1]:02n}")
+                    match_nr = match_nr + 1
                 current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
                 current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
 

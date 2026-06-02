@@ -19,13 +19,12 @@ The example file (example.py) contains an instance of the problem consisting of 
 
 The tournament plan is generated using a mixed-integer programming problem. This is solved by calling a solver from Python through PuLP. If a more powerful solver such as Gurobi or CPLEX is installed, it can be specified as a prioritized solver. However, this is not necessary.
 
-(TO-Do)
 The tournament schedule is then displayed on the console. In addition, .csv files are created to serve as input for the various provided LaTeX files. The resulting PDF files for the given example are linked below: 
 - Overall tournament schedule ([Example here](latex/schedule.pdf))
 - Group overview ([Example here](latex/groups.pdf))
-- Team schedules
-- Match score sheets: one is created for each match with the field, the playing teams and the referee team
-- Evaluation sheet
+- Team schedules ([Example here](latex/team-schedules.pdf))
+- Match score sheets: one is created for each match with the field, the playing teams and the referee team ([Example here](latex/match-reports.pdf))
+- Evaluation sheet ([Example here](latex/group-evaluation.pdf))
 
 
 ## Further Releases

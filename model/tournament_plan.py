@@ -3,6 +3,11 @@ from math import floor
 
 from model.team import Team
 from model.group import Group
+from pdfrw import PdfReader, PdfWriter, PageMerge, PdfDict
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+import io
+import os
 
 
 class TournamentPlan:
@@ -18,7 +23,7 @@ class TournamentPlan:
         "side1", "side2", "referee", "none"
     ]
 
-    def __init__(self, plan: List[List[Tuple[Team, Team, Team]]],
+    def __init__(self, plan: List[List[Tuple[Team, Team, Team, int]]],
                  groups: List[Group],
                  start_time: Tuple[int, int],
                  match_duration: Tuple[int, int],
@@ -62,8 +67,8 @@ class TournamentPlan:
         return_str = ''
         current_time = self._start_time
         for block in self._plan:
-            for f, (team1, team2, referee) in enumerate(block):
-                return_str += f"Court {f+1}, {current_time[0]:2n}:{current_time[1]:02n}: {team1.name} vs {team2.name} [{referee.name}]"
+            for team1, team2, referee, court in block:
+                return_str += f"Court {court+1}, {current_time[0]:2n}:{current_time[1]:02n}: {team1.name} vs {team2.name} [{referee.name}]"
                 return_str += '\n'
             current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
             current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
@@ -89,6 +94,15 @@ class TournamentPlan:
         return return_str
     
     def write_latex_style(self, tournamentname: str, courtcount: int, filename: str = "latex/tournamentstyle.sty") -> None:
+        if filename is None:
+            filename = os.path.join("latex", "tournamentstyle.sty")
+        else:
+            filename = os.path.normpath(filename)
+
+        dirname = os.path.dirname(filename)
+        if dirname and not os.path.exists(dirname):
+             os.makedirs(dirname)
+
         with open(filename, 'w', encoding="utf-8") as file:
             file.write("\\ProvidesPackage{tournamentstyle}\n")
             file.write(f"\\newcommand*{{\\tournamentname}}{{{tournamentname}}}\n")
@@ -99,10 +113,11 @@ class TournamentPlan:
         with open(filename, 'w', encoding="utf-8") as file:
             current_time = self._start_time
             file.write("Match Nr,Court,Team 1,Team 2,Referee,Time")
+            match_nr = 0
             for b, block in enumerate(self._plan):
-                for f, (team1, team2, referee) in enumerate(block):
-                    match_nr = b * self.courts + f
-                    file.write(f"\n{match_nr+1},{f+1},{team1.name},{team2.name},{referee.name},{current_time[0]:02n}:{current_time[1]:02n}")
+                for team1, team2, referee, court in block:
+                    match_nr = match_nr + 1
+                    file.write(f"\n{match_nr+1},{court+1},{team1.name},{team2.name},{referee.name},{current_time[0]:02n}:{current_time[1]:02n}")
                 current_time_minutes = (current_time[0] + self._match_duration[0] + self._break_duration[0]) * 60 + (current_time[1] + self._match_duration[1] + self._break_duration[1])
                 current_time = (floor(current_time_minutes / 60), current_time_minutes % 60)
 
@@ -112,6 +127,6 @@ class TournamentPlan:
             for group in self.groups:
                 for team in group.teams:
                     file.write(f"{group.name},{team.name}\n")
-    
+
     def __str__(self) -> str:
         return self.get_teams_schedule()

@@ -84,40 +84,6 @@
 				\fi
 	            \global\let\prevTime\time% the time of the previous row is updated
             }
-    		
-            \ifthenelse{\a=1}{
-                \createGame{below=\largegap of G20}{K1}{}{}{1}{}{20:30}{:}
-                \createGame{below=0mm of GK1}{K2}{}{}{2}{}{20:30}{:}
-                \createGame{below=0mm of GK2}{K5}{}{}{3}{}{20:30}{:}
-                
-                \createGame{below=\smallgap of GK5}{K3}{}{}{1}{}{20:45}{:}
-                \createGame{below=0mm of GK3}{K4}{}{}{2}{}{20:45}{:}
-                \createGame{below=0mm of GK4}{K6}{}{}{3}{}{20:45}{:}
-                
-                \createGame{below=\smallgap of GK6}{P3}{}{}{1}{}{21:00}{:}
-                \createGame{below=0mm of GP3}{P2}{}{}{2}{}{21:00}{:}
-                \createGame{below=0mm of GP2}{P5}{}{}{3}{}{21:00}{:}
-                
-                \createGame{below=\smallgap of GP5}{P1}{}{}{1}{}{21:15}{:}
-                \createGame{below=0mm of GP1}{P4}{}{}{3}{}{21:15}{:}
-            
-            }{
-                \createGame{below=\largegap of G20}{K1}{G1-2}{G2-3}{1}{G1-1}{20:30}{:}
-                \createGame{below=0mm of GK1}{K2}{G2-2}{G1-3}{2}{G2-1}{20:30}{:}
-                \createGame{below=0mm of GK2}{K5}{G1-4}{G2-5}{3}{G2-4}{20:30}{:}
-                
-                \createGame{below=\smallgap of GK5}{K3}{G1-1}{Gewinner K2}{1}{Verlierer K1}{20:45}{:}
-                \createGame{below=0mm of GK3}{K4}{G2-1}{Gewinner K1}{2}{Verlierer K2}{20:45}{:}
-                \createGame{below=0mm of GK4}{K6}{G2-4}{G1-5}{3}{G1-4}{20:45}{:}
-                
-                \createGame{below=\smallgap of GK6}{P3}{Verlierer K1}{Verlierer K2}{1}{Gewinner K3}{21:00}{:}
-                \createGame{below=0mm of GP3}{P2}{Verlierer K3}{Verlierer K4}{2}{Gewinner K4}{21:00}{:}
-                \createGame{below=0mm of GP2}{P5}{Verlierer K5}{Verlierer K6}{3}{Gewinner K5}{21:00}{:}
-                
-                \createGame{below=\smallgap of GP5}{P1}{Gewinner K3}{Gewinner K4}{1}{Gewinner P3}{21:15}{:}
-                \createGame{below=0mm of GP1}{P4}{Gewinner K5}{Gewinner K6}{3}{Gewinner P5}{21:15}{:}
-            
-            }
         \end{tikzpicture}
     
     \end{figure}
